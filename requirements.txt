@@ -5,4 +5,3 @@ playwright
 playwright-stealth
 langchain-google-genai
 asyncio
-json
