@@ -3,38 +3,39 @@ import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from scrapegraphai.graphs import SmartScraperGraph
 import json
+import os
 
 app = FastAPI()
 
-# --- STEP 1: Enable CORS ---
-# This allows your website to talk to this API even if they are on different domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace "*" with your website's URL
+    allow_origins=["*"], 
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- STEP 2: Configure Scraper ---
-# Note: On a server (Render/Railway), we MUST use headless: True
+# Configuration for Cloudflare Bypass
+# We use Playwright with Chromium and specifically enable 'stealth'
 graph_config = {
     "llm": {
-        "api_key": "AIzaSyBE7WkkvyEe3Uosp2CuKlN0a_X2dWMTWH8",
+        "api_key": os.getenv("GEMINI_API_KEY", "AIzaSyBE7WkkvyEe3Uosp2CuKlN0a_X2dWMTWH8"),
         "model": "google_genai/gemini-2.5-flash",
     },
     "verbose": True,
-    "headless": False, 
+    "headless": True,  # Must be True for Render/Linux servers
+    "loader_kwargs": {
+        "stealth": True, # Enables playwright-stealth to hide automation flags
+        "browser_type": "chromium"
+    },
+    "library": "playwright" 
 }
 
 def run_static_scraper():
-    """
-    Scraper logic with a HARDCODED URL.
-    """
-    # Change this URL to exactly what you want to scrape every time
     STATIC_URL = "https://www.expatriates.com/scripts/search/search.epl?page=2&category_id=50&region_id=49"
     
+    # SmartScraperGraph will now use Playwright under the hood
     smart_scraper_graph = SmartScraperGraph(
-        prompt="Extract all the text from the page and find the title, description, price, location, and link for each item for sale. Return the result as a list of dictionaries with keys: title, description, price, location, link. Make sure the data is all clean and well formatted",
+        prompt="Extract all listings. For each item, find the title, description, price, location, and link. Return a list of clean dictionaries.",
         source=STATIC_URL,
         config=graph_config
     )
@@ -43,15 +44,15 @@ def run_static_scraper():
 @app.get("/get-listings")
 async def get_listings():
     try:
-        # We use to_thread to prevent the 'NoEventLoopError'
+        # Running in a thread to keep the FastAPI event loop free
         result = await asyncio.to_thread(run_static_scraper)
-        print(json.dumps(result, indent=4))
         return result
-    
     except Exception as e:
         print(f"Scraper Error: {e}")
         raise HTTPException(status_code=500, detail=str(e)) 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Render uses the PORT environment variable
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
