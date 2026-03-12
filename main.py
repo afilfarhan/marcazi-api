@@ -21,7 +21,7 @@ graph_config = {
         "api_key": os.getenv("GEMINI_API_KEY", "AIzaSyBE7WkkvyEe3Uosp2CuKlN0a_X2dWMTWH8"),
         "model": "google_genai/gemini-2.5-flash",
     },
-    "headless": False,
+    "headless": True,
    "library": "playwright"
    
 }
