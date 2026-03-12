@@ -18,7 +18,7 @@ app.add_middleware(
 # We use Playwright with Chromium and specifically enable 'stealth'
 graph_config = {
     "llm": {
-        "api_key": os.getenv("GEMINI_API_KEY", "AIzaSyBE7WkkvyEe3Uosp2CuKlN0a_X2dWMTWH8"),
+        "api_key": os.getenv("GEMINI_API_KEY", "AIzaSyD8hWUE0EgJ32LyuenYtQVWENRJSUNJr1g"),
         "model": "google_genai/gemini-2.5-flash",
     },
     "headless": True,
