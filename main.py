@@ -24,10 +24,12 @@ graph_config = {
     "verbose": True,
     "headless": True,  # Must be True for Render/Linux servers
     "loader_kwargs": {
-        "stealth": True, # Enables playwright-stealth to hide automation flags
+       
         "browser_type": "chromium"
     },
-    "library": "playwright" 
+    "library": "playwright",
+    "stealth": True # Enables playwright-stealth to hide automation flags
+   
 }
 
 def run_static_scraper():
