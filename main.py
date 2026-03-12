@@ -21,14 +21,8 @@ graph_config = {
         "api_key": os.getenv("GEMINI_API_KEY", "AIzaSyBE7WkkvyEe3Uosp2CuKlN0a_X2dWMTWH8"),
         "model": "google_genai/gemini-2.5-flash",
     },
-    "verbose": True,
-    "headless": True,  # Must be True for Render/Linux servers
-    "loader_kwargs": {
-       
-        "browser_type": "chromium"
-    },
-    "library": "playwright",
-    "stealth": True # Enables playwright-stealth to hide automation flags
+    "headless": False,
+   "library": "playwright"
    
 }
 
